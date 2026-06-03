@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.dmggg.curso_spring_crud_v3.dto.CategoryDTO;
 import com.dmggg.curso_spring_crud_v3.entities.Category;
 import com.dmggg.curso_spring_crud_v3.repositories.CategoryRepository;
+import com.dmggg.curso_spring_crud_v3.services.exceptions.EntityNotFound;
 
 @Service
 public class CategoryService {
@@ -33,7 +34,8 @@ public class CategoryService {
   @Transactional(readOnly = true)
   public CategoryDTO find_by_id(long id){
     Optional<Category> category = repository.findById(id);
-    CategoryDTO categoryDTO = new CategoryDTO(category.get());
+    CategoryDTO categoryDTO = new CategoryDTO(category.orElseThrow(() -> 
+      new EntityNotFound("entity not found")));
 
     return categoryDTO;
   }
