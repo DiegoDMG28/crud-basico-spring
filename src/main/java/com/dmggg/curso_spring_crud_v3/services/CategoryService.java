@@ -13,6 +13,8 @@ import com.dmggg.curso_spring_crud_v3.entities.Category;
 import com.dmggg.curso_spring_crud_v3.repositories.CategoryRepository;
 import com.dmggg.curso_spring_crud_v3.services.exceptions.EntityNotFound;
 
+import jakarta.persistence.EntityNotFoundException;
+
 @Service
 public class CategoryService {
 
@@ -38,6 +40,28 @@ public class CategoryService {
       new EntityNotFound("entity not found")));
 
     return categoryDTO;
+  }
+
+  @Transactional
+  public CategoryDTO insert(CategoryDTO dto){
+    Category entity = new Category();
+    entity.setNome(dto.getNome());
+     
+    entity = repository.save(entity);
+    return new CategoryDTO(entity);
+  }
+
+  @Transactional
+  public CategoryDTO update(CategoryDTO dto, Long id){
+    try{
+    Category entity = repository.getReferenceById(id);
+    entity.setNome(dto.getNome());
+    entity = repository.save(entity);
+    return new CategoryDTO(entity);
+    }
+    catch(EntityNotFoundException e){
+      throw new EntityNotFound("id não encontrado em nosso banco de dados");
+    }
   }
 
 }
