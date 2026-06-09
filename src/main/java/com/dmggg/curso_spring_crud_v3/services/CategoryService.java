@@ -5,12 +5,15 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.dmggg.curso_spring_crud_v3.dto.CategoryDTO;
 import com.dmggg.curso_spring_crud_v3.entities.Category;
 import com.dmggg.curso_spring_crud_v3.repositories.CategoryRepository;
+import com.dmggg.curso_spring_crud_v3.services.exceptions.DatabaseException;
 import com.dmggg.curso_spring_crud_v3.services.exceptions.EntityNotFound;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -60,7 +63,19 @@ public class CategoryService {
     return new CategoryDTO(entity);
     }
     catch(EntityNotFoundException e){
-      throw new EntityNotFound("id não encontrado em nosso banco de dados");
+      throw new EntityNotFound("id não encontrado em nosso banco de dados, id: " + id);
+    }
+  }
+
+  public void delete(Long id){
+    if(!repository.existsById(id)){
+      throw new EntityNotFound("id não encontrado em nosso banco de dados, id: " + id);
+    }
+    try{
+    repository.deleteById(id);
+    }
+    catch(DataIntegrityViolationException e){
+      throw new DatabaseException("Integrity violation");
     }
   }
 
