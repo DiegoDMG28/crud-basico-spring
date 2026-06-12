@@ -7,6 +7,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +38,18 @@ public class CategoryService {
     return listDTO;
   };
 
+
+
+  @Transactional(readOnly = true)
+  public Page<CategoryDTO> find_all_paged(PageRequest pageRequest){
+    Page<Category> list = repository.findAll(pageRequest);
+    Page<CategoryDTO> listDTO = list.map(x -> new CategoryDTO(x)); 
+
+    return listDTO;
+  };
+
+
+
   @Transactional(readOnly = true)
   public CategoryDTO find_by_id(long id){
     Optional<Category> category = repository.findById(id);
@@ -45,6 +59,8 @@ public class CategoryService {
     return categoryDTO;
   }
 
+
+
   @Transactional
   public CategoryDTO insert(CategoryDTO dto){
     Category entity = new Category();
@@ -53,6 +69,8 @@ public class CategoryService {
     entity = repository.save(entity);
     return new CategoryDTO(entity);
   }
+
+
 
   @Transactional
   public CategoryDTO update(CategoryDTO dto, Long id){
@@ -66,6 +84,8 @@ public class CategoryService {
       throw new EntityNotFound("id não encontrado em nosso banco de dados, id: " + id);
     }
   }
+
+
 
   public void delete(Long id){
     if(!repository.existsById(id)){
